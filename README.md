@@ -1,21 +1,38 @@
 # dsh-annotate-browser
 
-自己的 DSH **标注浏览器**插件：在输入框上方开一个面板，看着浏览器画面点选元素、写一句备注，注释直接落进聊天输入框。
+自己的 DSH **标注浏览器**插件：右侧栏里一个**可操作的真实浏览器**（CDP 推流 + 输入转发），在上面点选元素或划选文字、写一句备注，带着源码位置/组件栈/样式/裁图落进聊天输入框。
 **不依赖** `dsh-browser-cdp` 或任何第三方浏览器插件 —— CDP 客户端是本仓库自己实现的（零依赖）。
 
 > 定位：给「人指出问题 → agent 改代码」这条链路提供一个完全自主的壳，后续功能按需要自己往上加。
 
-## 现在能用什么（v0.1.0）
+## 现在能用什么（v0.2.2）
 
-1. 右侧栏多一个 tab **「标注浏览器」**，撑满侧栏；
-2. 面板里是目标页面的**实时截图**（默认 1.2s 一轮，读设置里的 `pollMs`，走 `Page.captureScreenshot`）；
-3. 打开工具条上的 **「标注」开关** 后，点画面里的元素 → 取到该元素（tag / id / 文本 / 矩形 / 页面标题）；
-   落点会画一个圆钉，备注卡贴着它出现（`Enter` 插入 / `Esc` 取消）；
-4. 写一句备注 → 「插入对话」，输入框里出现：
+**浏览**（面板里是一个可操作的真实页面，不只是截图）
 
-```text
-〔标注〕button#submit「确认支付」｜页面：收银台 https://…｜备注：文案改成“确认支付”
-```
+1. 右侧栏 tab「标注浏览器」，撑满侧栏、按面板尺寸 1:1 渲染（视口随宽高自适应，无黑边）；
+2. 地址栏 + `← → ⟳` + 标签页（新建 / 切换 / 关闭，>1 个才显示标签条）；
+3. **直接操作**：点击 / 双击 / 右键 / 拖拽 / 滚轮 / 键盘（含 Backspace、方向键、Tab），`⌘A/C/V/X/Z` 放行给页面；
+4. 画面走 **CDP screencast 推流**（只在画面变化时推，15fps 上限），断线自动退回 450ms 轮询；
+5. 「⋯」菜单里：设备宽度 390/768/1280、移动端模拟（触屏 + iPhone UA + 390×800@2x）。
+
+**标注**
+
+6. `⌘I` 开标注 → 鼠标悬停即出现 **DevTools 式高亮**（白框 + tag/尺寸/AX 信息，`Overlay.highlightNode`）；
+7. 点元素选中（会**穿透全屏透明遮罩**，取真正被点到的元素），页面留下 **编号钉 + 蓝框**；
+8. 拖拽 = 在页面里**真实选中文字**，以选区文本作为标注对象；
+9. **多选**：写备注 →「加入列表」→ 继续选 →「插入 N 条」一次性写入；
+10. 标注钉的备注气泡 **hover 才显示**（不挡页面）；
+11. `⌘C` 复制悬停元素的载荷（不插入对话也能贴到别处）。
+
+**标注携带什么**
+
+12. 选择器（`data-testid` > `id` > 自动分配的 `data-ab-id` > `nth-child` 路径）、属性、`role`/`aria-label`；
+13. **源码位置** `file:line:col`（React `_debugSource` / Vue `__file` / Svelte `__svelte_meta`）+ **组件栈**；
+14. 计算样式子集、位置与视口、父级链、父级文本上下文、outerHTML 截断、页面 route；
+15. **元素裁图** PNG（`~/.dsh/data/dsh-annotate-browser/crops/`）；
+16. 结构化载荷落 JSON（`~/.dsh/data/dsh-annotate-browser/annotations/<日期>-<host>.json`），输入框里只放一行摘要 + 文件路径。
+
+> 源码位置只在**开发构建**存在；生产站点没有 source map 时退化为「组件名（生产构建无源码映射）」。
 
 ## 结构
 
@@ -75,27 +92,52 @@ dsh plugin --profile desktop add file:~/Documents/study/探索/dsh-annotate-brow
 
 ## 路由
 
-`/api/annotate-browser/{status,shot,element,navigate,stop}` —— `stop` 只关闭**我们自己拉起**的那台 Chrome。
+全部挂在 `/api/annotate-browser/`：
+
+| 路由 | 作用 |
+|---|---|
+| `GET status` | 连接状态、当前页、推流目标、watcher 数 |
+| `GET shot` | 单帧 JPEG（轮询兜底） |
+| `GET stream` | SSE 推流（screencast 帧） |
+| `POST element` | 坐标 → 元素完整载荷（穿透遮罩、含源码/组件栈/样式/上下文） |
+| `POST hover` | 坐标 → DevTools 高亮（`hide:true` 收掉） |
+| `POST navigate` / `nav` / `tabs` | 打开网址 / 前进后退刷新 / 标签页 list·new·activate·close |
+| `POST viewport` / `mobile` / `freeze` | 视口尺寸 / 移动端模拟 / 冻结动效 |
+| `POST input` | 点击·双击·右键·拖拽·滚轮·按键·文本 |
+| `POST selection` | 读页面当前选区文字 + 锚点元素 |
+| `POST mark` / `marks/clear` | 页面留编号标注 / 清空 |
+| `POST annotations` | 结构化载荷落 JSON |
+| `GET annotations/count` | 当天同 host 已有条数（编号延续） |
+| `POST crop` | 元素裁图 PNG |
+| `POST start` / `stop` | 启动 / 关闭**我们自己拉起**的 Chrome |
 
 ## 已验证 / 未验证
 
 | 项 | 状态 | 证据 |
 |---|---|---|
-| CDP 层：连接 / 截图 / 坐标取元素 | ✅ 已验证 | `test/cdp-smoke.mjs`：截图 6877B、`elementAt` 返回 BODY 及其矩形 |
-| 服务层：status / shot / elementAt | ✅ 已验证 | `test/service-smoke.mjs`：`shotBytes:6878`、element 结构完整 |
-| 无页面时自动建标签 | ✅ 已验证 | 无头 Chrome 零标签场景下 `Target.createTarget` 生效 |
-| 自己启动 Chrome（无头）→ 截图 → 取元素 → 优雅关闭 | ✅ 已验证 | `test/launcher-smoke.mjs`：ws `:57798`、截图 63130B、element=MAIN(0,40,1265,575) |
-| 设置项（wsUrl/chromePath/headless/autoLaunch/profileDir/pollMs/quality） | ✅ 代码就绪 | Schemastery 分区 + `cordis.patch.yml` 两种入口；**设置页渲染未验收** |
-| 客户端面板渲染 / 插入草稿 | ❌ 未验收 | 需装进 DSH 重启后确认 |
+| CDP 层 / 服务层 / 自启 Chrome | ✅ 已验证 | `test/cdp-smoke.mjs`、`service-smoke.mjs`、`launcher-smoke.mjs` 全部通过 |
+| 坐标取元素穿透遮罩 | ✅ 已验证 | DeepSeek 首页同坐标：`div`(1265×813 遮罩) → `A.ds-btn-secondary`(209×44) |
+| DevTools 高亮 | ✅ 已验证 | 截图可见白框 + `209.38 × 44` + AX 信息 |
+| 截图与面板 1:1 | ✅ 已验证 | 700×880 / 420×760 / 340×640 三种尺寸截图尺寸完全一致 |
+| 推流跟随切页 | ✅ 已验证 | SSE 保持连接中途 activate，`streamTarget == page` 同步变化 |
+| 移动端模拟 | ✅ 已验证 | `{"w":390,"h":800,"dpr":2,"touch":true}` + iPhone UA |
+| 输入转发（含删除/双击） | ✅ 已验证 | Wikipedia 搜索框：`abc` → Backspace → `ab`；双击选中 `[0,5]"hello"` |
+| 源码位置 + 组件栈 | ✅ 已验证 | 清影 dev：`pages/Profile/index.tsx:496` + `Profile ← Outlet ← Layout ← Routes ← App` |
+| 元素裁图 | ✅ 已验证 | 720×382 PNG 落盘，`sips` 尺寸与元素一致 |
+| 面板渲染 | ✅ 已验证（预览台） | `test/preview` 加载真实 `client.js`：`root:true`、无运行时异常 |
+| **真实 DSH 内交互全链路** | ❌ 未验收 | 需人手动走：`⌘I` → 悬停白框 → 点选 → 备注 → 加入列表 → 插入 N 条 |
 
-## ROADMAP（功能由使用中按需追加）
+## ROADMAP
 
-- [x] 设置项：wsUrl / chromePath / headless / autoLaunch / profileDir / pollMs / quality
-- [ ] 多选：一次标 3～5 个元素，页面上打 1/2/3 编号，草稿里聚合成一个块
-- [ ] 注释胶囊聚合（像划词注释那样只占一行，可展开编辑/删除）
-- [ ] 模型工具面：`ab_open` / `ab_shot` / `ab_click` / `ab_mark`，让 agent 也能主动开页面
-- [ ] 多标签切换 + 页面导航历史
-- [ ] 区域截图标注（框选一块区域贴进对话）
+- [x] 设置项：wsUrl / chromePath / headless / autoLaunch / profileDir / pollMs / quality / homeUrl / streamMode / streamFps
+- [x] 多选：一次标多个，页面打编号，草稿聚合
+- [x] 多标签切换 + 导航历史（← → ⟳）
+- [x] 元素裁图
+- [x] 选中文字标注
+- [x] 移动端模拟 / 设备宽度预设
+- [ ] 注释胶囊聚合（只占一行，可展开编辑/删除）
+- [ ] 模型工具面：`ab_open` / `ab_shot` / `ab_click` / `ab_mark`，让 agent 主动操作
+- [ ] 区域框选截图
 
 ## 许可
 
