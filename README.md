@@ -47,6 +47,26 @@
 | `test/preview/` | 面板预览台：mock 后端 + 真 `client.js`，不启 DSH 也能看图、批量截图 |
 | `docs/DESIGN.md` | 面板布局/尺寸/状态/交互的规格与理由 |
 
+## 命令行：启动 / 自检 / 停止
+
+DSH 面板是主入口，但后端可以单独起（不经过 DSH 的 web 鉴权，便于排障）：
+
+```sh
+node scripts/annotate-server.mjs          # 自检：连端点、列页面、抓一帧、取一个元素
+node scripts/annotate-server.mjs start    # 没端点就拉起一台无头 Chrome 并打开首页
+node scripts/annotate-server.mjs stop     # 关闭「本脚本拉起的」Chrome（外部端点不动）
+```
+
+输出示例：
+
+```text
+端点: ws://127.0.0.1:50272/devtools/browser/…
+页面: 3
+  - http://127.0.0.1:5173/profile | 清影
+截图: 34KB / 38ms
+取元素: div | GUEST ACCESS 登录清影账户…
+```
+
 ## 安装
 
 还没发布 npm，直接从仓库装：
