@@ -1,3 +1,8 @@
 node_modules/
 .DS_Store
 *.log
+
+# 预览台的第三方 UMD 与产物（见 test/preview/README.md）
+test/preview/vendor/
+test/preview/shots/
+test/preview/.chrome-profile/

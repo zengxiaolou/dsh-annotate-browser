@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">
+  <rect width="1280" height="820" fill="#f6f8fa"/>
+  <rect width="1280" height="56" fill="#ffffff"/>
+  <line x1="0" y1="56" x2="1280" y2="56" stroke="#d0d7de"/>
+  <circle cx="36" cy="28" r="10" fill="#0969da"/>
+  <text x="56" y="33" font-size="16" font-weight="600" fill="#1f2328">示例商城</text>
+  <text x="1000" y="33" font-size="14" fill="#57606a">购物车 · 2 件</text>
+
+  <rect x="120" y="104" width="640" height="520" rx="12" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="152" y="150" font-size="20" font-weight="600" fill="#1f2328">确认订单</text>
+  <text x="152" y="184" font-size="14" fill="#57606a">收货信息 · 上海市浦东新区</text>
+  <line x1="152" y1="208" x2="728" y2="208" stroke="#eaeef2"/>
+
+  <rect x="152" y="232" width="64" height="64" rx="8" fill="#eaeef2"/>
+  <text x="232" y="258" font-size="15" fill="#1f2328">示例商品 · 标准版</text>
+  <text x="232" y="282" font-size="13" fill="#57606a">数量 1 · 一年订阅</text>
+  <text x="700" y="262" font-size="15" text-anchor="end" fill="#1f2328">¥ 1,280.00</text>
+
+  <rect x="152" y="320" width="576" height="1" fill="#eaeef2"/>
+  <text x="152" y="356" font-size="14" fill="#57606a">小计</text>
+  <text x="728" y="356" font-size="14" text-anchor="end" fill="#1f2328">¥ 1,280.00</text>
+  <text x="152" y="388" font-size="14" fill="#57606a">运费</text>
+  <text x="728" y="388" font-size="14" text-anchor="end" fill="#1f2328">¥ 0.00</text>
+
+  <rect x="152" y="536" width="576" height="44" rx="8" fill="#1f883d"/>
+  <text x="440" y="564" font-size="16" font-weight="600" text-anchor="middle" fill="#ffffff">确认支付 ¥ 1,280.00</text>
+  <text x="152" y="606" font-size="12" fill="#8c959f">点击即表示同意《服务条款》</text>
+
+  <rect x="800" y="104" width="360" height="248" rx="12" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="828" y="146" font-size="16" font-weight="600" fill="#1f2328">订单摘要</text>
+  <text x="828" y="180" font-size="13" fill="#57606a">订单号 20261023A7</text>
+  <text x="828" y="206" font-size="13" fill="#57606a">支付方式 · 在线支付</text>
+  <text x="828" y="232" font-size="13" fill="#57606a">预计发货 · 24 小时内</text>
+  <rect x="828" y="258" width="304" height="34" rx="6" fill="#ddf4ff"/>
+  <text x="844" y="280" font-size="12" fill="#0969da">新用户立减券已自动应用</text>
+
+  <rect x="800" y="376" width="360" height="248" rx="12" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="828" y="418" font-size="16" font-weight="600" fill="#1f2328">客服</text>
+  <text x="828" y="452" font-size="13" fill="#57606a">工作日 9:00–21:00</text>
+  <text x="828" y="478" font-size="13" fill="#57606a">在线咨询 · 400-000-0000</text>
+</svg>

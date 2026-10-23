@@ -7,9 +7,10 @@
 
 ## 现在能用什么（v0.1.0）
 
-1. 输入框上方出现胶囊 **「🖱 标注浏览器」**，点开是面板；
-2. 面板里是目标页面的**实时截图**（1.2s 轮询，走 `Page.captureScreenshot`）；
-3. 在图上点一下 → 取到该元素（tag / id / 文本 / 矩形 / 页面标题）；
+1. 右侧栏多一个 tab **「标注浏览器」**，撑满侧栏；
+2. 面板里是目标页面的**实时截图**（默认 1.2s 一轮，读设置里的 `pollMs`，走 `Page.captureScreenshot`）；
+3. 打开工具条上的 **「标注」开关** 后，点画面里的元素 → 取到该元素（tag / id / 文本 / 矩形 / 页面标题）；
+   落点会画一个圆钉，备注卡贴着它出现（`Enter` 插入 / `Esc` 取消）；
 4. 写一句备注 → 「插入对话」，输入框里出现：
 
 ```text
@@ -23,9 +24,11 @@
 | `lib/cdp.js` | 零依赖 CDP 客户端（全局 WebSocket）：连接、附页、截图、坐标取元素 |
 | `lib/service.js` | 端点解析（默认读 ego 的 `browser.json`，也可配 `wsUrl`）、截图/取元素/导航 |
 | `lib/index.js` | 宿主插件：注册 `/api/annotate-browser/{status,shot,element,navigate}` |
-| `lib/client.js` | 客户端插件：`conversation.input.dock` 上的胶囊 + 面板 |
+| `lib/client.js` | 客户端插件：右侧栏面板 + `conversation.input.dock` 上的隐藏草稿写入器 |
 | `test/cdp-smoke.mjs` | 只测 CDP 层（不启动 DSH） |
 | `test/service-smoke.mjs` | 走服务层，验证 status/shot/elementAt |
+| `test/preview/` | 面板预览台：mock 后端 + 真 `client.js`，不启 DSH 也能看图、批量截图 |
+| `docs/DESIGN.md` | 面板布局/尺寸/状态/交互的规格与理由 |
 
 ## 安装
 

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="860" viewBox="0 0 420 860" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">
+  <rect width="420" height="860" fill="#f6f8fa"/>
+  <rect width="420" height="52" fill="#ffffff"/>
+  <line x1="0" y1="52" x2="420" y2="52" stroke="#d0d7de"/>
+  <text x="20" y="33" font-size="15" font-weight="600" fill="#1f2328">库存盘点</text>
+  <text x="400" y="33" font-size="13" text-anchor="end" fill="#57606a">保存</text>
+
+  <rect x="20" y="76" width="380" height="120" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="40" y="108" font-size="14" fill="#1f2328">A-1024 · 螺丝 M3</text>
+  <text x="40" y="134" font-size="12" fill="#57606a">账面 1,200 · 实盘 1,186</text>
+  <text x="40" y="160" font-size="12" fill="#cf222e">差异 −14</text>
+
+  <rect x="20" y="212" width="380" height="120" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="40" y="244" font-size="14" fill="#1f2328">B-2048 · 垫片</text>
+  <text x="40" y="270" font-size="12" fill="#57606a">账面 640 · 实盘 640</text>
+  <text x="40" y="296" font-size="12" fill="#1a7f37">一致</text>
+
+  <rect x="20" y="348" width="380" height="120" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="40" y="380" font-size="14" fill="#1f2328">C-4096 · 弹簧</text>
+  <text x="40" y="406" font-size="12" fill="#57606a">账面 88 · 实盘 91</text>
+  <text x="40" y="432" font-size="12" fill="#9a6700">差异 +3</text>
+
+  <rect x="20" y="760" width="380" height="48" rx="10" fill="#1f883d"/>
+  <text x="210" y="790" font-size="15" font-weight="600" text-anchor="middle" fill="#ffffff">提交盘点结果</text>
+</svg>
