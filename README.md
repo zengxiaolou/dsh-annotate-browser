@@ -47,6 +47,18 @@
 | `test/preview/` | 面板预览台：mock 后端 + 真 `client.js`，不启 DSH 也能看图、批量截图 |
 | `docs/DESIGN.md` | 面板布局/尺寸/状态/交互的规格与理由 |
 
+## 与「长文本胶囊」的接入（dsh-paste-chip）
+
+标注插入对话框时有两层兼容，任何一层生效都会变成芯片：
+
+| 通道 | 做法 | 效果 |
+|---|---|---|
+| **主动** | `ctx.inject(["pasteChip"])` → `pasteChip.insert(正文, { sessionId, span: inputActions.captureInsertion(), label: "标注 · N 条" })` | 原子插入，标签带条数，草稿里只有芯片 |
+| **被动**（兜底） | 退回 `inputActions.setDraft()` 追加文本 | dsh-paste-chip 的差异观察器会认出「外部插入」并折叠成芯片（它 README 里明确列了标注浏览器） |
+| **回退**（都不行） | `pasteChip` 不在 / 没有 span / 超 20 万字 → 直接写普通文本 | 内容不丢，只是不折叠 |
+
+胶囊服务缺失时只打印一条 `console.warn`，不影响标注主流程。
+
 ## 命令行：启动 / 自检 / 停止
 
 DSH 面板是主入口，但后端可以单独起（不经过 DSH 的 web 鉴权，便于排障）：
