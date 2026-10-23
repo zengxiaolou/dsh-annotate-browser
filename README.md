@@ -39,10 +39,40 @@ dsh plugin --profile desktop add file:~/Documents/study/探索/dsh-annotate-brow
 
 装完重启 DSH，输入框上方应出现胶囊。
 
-## CDP 端点
+## CDP 端点与自动启动（v0.2）
 
-默认读 `~/.local/state/ego-lite-linux/browser.json` 的 `wsUrl`（任何用 `--remote-debugging-port` 起的 Chrome 也只要填 wsUrl）。
-后续会把端点做成设置项（见 ROADMAP）。
+解析顺序：
+
+1. 设置里的 **`wsUrl`**（显式指定）；
+2. `~/.local/state/ego-lite-linux/browser.json`（有别的插件/脚本起了 Chrome 就复用）；
+3. **自己拉起一台 Chrome**（`lib/launcher.js`）：`--remote-debugging-port=0` + 独立 profile（默认
+   `~/.local/share/dsh-annotate-browser/profile`），读 `DevToolsActivePort` 拿 ws 地址；无头优先。
+
+## 设置项（`dsh-annotate-browser`）
+
+装了 `@deepseek-ai/dsh-settings` 时出现在插件设置页；也可以直接在 `cordis.patch.yml` 里写 config：
+
+| 键 | 默认 | 说明 |
+|---|---|---|
+| `wsUrl` | `""` | 显式 CDP 端点；空 = 复用或自己启动 |
+| `chromePath` | `""` | Chrome 路径；空 = 自动探测 |
+| `headless` | `true` | 自己启动的浏览器是否无头 |
+| `autoLaunch` | `true` | 没有现成端点时是否自动启动 |
+| `profileDir` | `""` | 空 = `~/.local/share/dsh-annotate-browser/profile` |
+| `pollMs` | `1200` | 面板拉画面间隔 |
+| `quality` | `82` | 画面 JPEG 质量 |
+
+```yaml
+- id: dsh-annotate-browser
+  config:
+    headless: true
+    pollMs: 1200
+    quality: 85
+```
+
+## 路由
+
+`/api/annotate-browser/{status,shot,element,navigate,stop}` —— `stop` 只关闭**我们自己拉起**的那台 Chrome。
 
 ## 已验证 / 未验证
 
@@ -51,12 +81,13 @@ dsh plugin --profile desktop add file:~/Documents/study/探索/dsh-annotate-brow
 | CDP 层：连接 / 截图 / 坐标取元素 | ✅ 已验证 | `test/cdp-smoke.mjs`：截图 6877B、`elementAt` 返回 BODY 及其矩形 |
 | 服务层：status / shot / elementAt | ✅ 已验证 | `test/service-smoke.mjs`：`shotBytes:6878`、element 结构完整 |
 | 无页面时自动建标签 | ✅ 已验证 | 无头 Chrome 零标签场景下 `Target.createTarget` 生效 |
-| 客户端面板渲染 / 插入草稿 | ❌ 未验收 | 需要装进 DSH 并重启，当前会话不方便重启验证 |
-| 设置页（wsUrl 可配） | ❌ 未实现 | 现在只能读默认 browser.json |
+| 自己启动 Chrome（无头）→ 截图 → 取元素 → 优雅关闭 | ✅ 已验证 | `test/launcher-smoke.mjs`：ws `:57798`、截图 63130B、element=MAIN(0,40,1265,575) |
+| 设置项（wsUrl/chromePath/headless/autoLaunch/profileDir/pollMs/quality） | ✅ 代码就绪 | Schemastery 分区 + `cordis.patch.yml` 两种入口；**设置页渲染未验收** |
+| 客户端面板渲染 / 插入草稿 | ❌ 未验收 | 需装进 DSH 重启后确认 |
 
 ## ROADMAP（功能由使用中按需追加）
 
-- [ ] 设置卡片：wsUrl / 轮询间隔 / 画质
+- [x] 设置项：wsUrl / chromePath / headless / autoLaunch / profileDir / pollMs / quality
 - [ ] 多选：一次标 3～5 个元素，页面上打 1/2/3 编号，草稿里聚合成一个块
 - [ ] 注释胶囊聚合（像划词注释那样只占一行，可展开编辑/删除）
 - [ ] 模型工具面：`ab_open` / `ab_shot` / `ab_click` / `ab_mark`，让 agent 也能主动开页面
