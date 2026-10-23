@@ -1,0 +1,4 @@
+# 插件加载入口：DSH 的 loader 用 id + name 挂载本插件
+- insert:
+    - id: dsh-annotate-browser
+      name: "dsh-annotate-browser"
