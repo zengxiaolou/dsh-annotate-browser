@@ -26,7 +26,8 @@
     }
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22",
+    "dsh": ">=0.2.0-rc.1 <0.3.0-0"
   },
   "scripts": {
     "smoke": "node test/cdp-smoke.mjs"
