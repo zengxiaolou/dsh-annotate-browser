@@ -2,6 +2,14 @@
 
 ![dsh-annotate-browser](https://raw.githubusercontent.com/zengxiaolou/dsh-annotate-browser/main/docs/images/promo.png)
 
+<p>
+<a href="https://www.npmjs.com/package/dsh-annotate-browser"><img alt="npm" src="https://img.shields.io/npm/v/dsh-annotate-browser?color=2f81f7&label=npm"></a>
+<a href="https://www.npmjs.com/package/dsh-annotate-browser"><img alt="downloads" src="https://img.shields.io/npm/dw/dsh-annotate-browser?color=3fb950"></a>
+<a href="https://github.com/zengxiaolou/dsh-annotate-browser/blob/main/LICENSE"><img alt="license" src="https://img.shields.io/npm/l/dsh-annotate-browser?color=bf8700"></a>
+<img alt="dsh plugin" src="https://img.shields.io/badge/DSH-plugin-7aa2ff">
+<a href="https://github.com/zengxiaolou/dsh-annotate-browser/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/zengxiaolou/dsh-annotate-browser?color=8250df"></a>
+</p>
+
 
 自己的 DSH **标注浏览器**插件：右侧栏里一个**可操作的真实浏览器**（CDP 推流 + 输入转发），在上面点选元素或划选文字、写一句备注，带着源码位置/组件栈/样式/裁图落进聊天输入框。
 **不依赖** `dsh-browser-cdp` 或任何第三方浏览器插件 —— CDP 客户端是本仓库自己实现的（零依赖）。
