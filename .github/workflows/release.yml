@@ -10,6 +10,10 @@ on:
         description: 只计算版本号，不提交、不打标签、不发布
         type: boolean
         default: true
+      force_publish:
+        description: 忽略提交类型，强制发一个补丁版本（dry_run 关掉才生效）
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -49,7 +53,10 @@ jobs:
 
       - name: 算下一个版本
         id: plan
-        run: node .github/scripts/release.mjs --notes-file .release-notes.md >> "$GITHUB_OUTPUT"
+        run: |
+          extra=""
+          if [ "${{ github.event.inputs.force_publish }}" = "true" ]; then extra="--force"; fi
+          node .github/scripts/release.mjs $extra --notes-file .release-notes.md >> "$GITHUB_OUTPUT"
 
       - name: 没有需要发的版本
         if: steps.plan.outputs.changed != 'true'

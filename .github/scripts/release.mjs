@@ -13,6 +13,8 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 
 const argv = process.argv.slice(2)
+/** --force：手动发一次补丁位（用于验证发布链路，或补一个纯版本提交） */
+const forced = argv.includes('--force')
 const notesFlag = argv.indexOf('--notes-file')
 const notesPath = notesFlag >= 0 ? argv[notesFlag + 1] : null
 
@@ -89,14 +91,19 @@ function renderNotes(version, groups) {
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
 const tag = lastTag()
 const commits = commitsSince(tag)
-const { bump, groups } = plan(commits)
+const planned = plan(commits)
+const groups = planned.groups
+const bump = forced ? 1 : planned.bump
 const changed = bump > 0
 const version = changed ? nextVersion(pkg.version, bump) : pkg.version
 
-if (notesPath) writeFileSync(notesPath, changed ? renderNotes(version, groups) : '')
+if (notesPath) {
+  const notes = changed ? renderNotes(version, groups) : ''
+  writeFileSync(notesPath, notes.trim() === `## v${version}`.trim() ? `## v${version}\n\n手动发布（无代码变更，仅版本号）。\n` : notes)
+}
 
 log(`上一次 tag: ${tag ?? '(无)'}｜自那之后 ${commits.length} 条提交`)
-log(changed ? `要发版: ${pkg.version} → ${version}（bump=${bump === 2 ? 'minor' : 'patch'}）` : '不发版：没有 feat / fix / perf 提交')
+log(changed ? `要发版: ${pkg.version} → ${version}（bump=${bump === 2 ? 'minor' : 'patch'}${forced ? '，手动强制' : ''}）` : '不发版：没有 feat / fix / perf 提交')
 
 console.log(`changed=${changed}`)
 console.log(`version=${version}`)
