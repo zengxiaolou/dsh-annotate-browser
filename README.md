@@ -1,5 +1,8 @@
 # dsh-annotate-browser
 
+![真实界面：侧栏里的标注浏览器](https://raw.githubusercontent.com/zengxiaolou/dsh-annotate-browser/main/docs/images/panel.png)
+
+
 ![dsh-annotate-browser](https://raw.githubusercontent.com/zengxiaolou/dsh-annotate-browser/main/docs/images/promo.png)
 
 <p>
