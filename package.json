@@ -31,5 +31,18 @@
   "scripts": {
     "smoke": "node test/cdp-smoke.mjs"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zengxiaolou/dsh-annotate-browser"
+  },
+  "homepage": "https://github.com/zengxiaolou/dsh-annotate-browser",
+  "bugs": {
+    "url": "https://github.com/zengxiaolou/dsh-annotate-browser/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness"
+  ]
 }
