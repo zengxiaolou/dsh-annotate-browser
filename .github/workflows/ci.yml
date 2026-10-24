@@ -24,6 +24,15 @@ jobs:
         with:
           node-version: '22'
 
+      # 零依赖的仓库直接跳过（装了反而慢），有依赖的才装
+      - name: 安装依赖
+        run: |
+          if node -e "const p=require('./package.json');const n=Object.keys(p.dependencies||{}).length+Object.keys(p.devDependencies||{}).length;process.exit(n?0:1)"; then
+            npm install --no-audit --no-fund
+          else
+            echo "零依赖，跳过安装"
+          fi
+
       # 没有 test 脚本的仓库会直接跳过，不会因此变红
       - name: 跑测试
         run: npm test --if-present
