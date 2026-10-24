@@ -19,6 +19,15 @@
 
 > 定位：给「人指出问题 → agent 改代码」这条链路提供一个完全自主的壳，后续功能按需要自己往上加。
 
+## 三步流程（真实界面截图）
+
+| ① 框选 | ② 插入批注 | ③ 出错态 |
+| --- | --- | --- |
+| ![框选](https://raw.githubusercontent.com/zengxiaolou/dsh-annotate-browser/main/docs/images/step-1-pick.png) | ![插入](https://raw.githubusercontent.com/zengxiaolou/dsh-annotate-browser/main/docs/images/step-2-insert.png) | ![出错](https://raw.githubusercontent.com/zengxiaolou/dsh-annotate-browser/main/docs/images/step-3-error.png) |
+
+> 三张都是从 `test/preview/shots/` 里挑的真实运行截图（模拟器 1400×1800 / 720×1560），不是示意图。
+
+
 ## 现在能用什么（v0.2.3）
 
 **浏览**（面板里是一个可操作的真实页面，不只是截图）
