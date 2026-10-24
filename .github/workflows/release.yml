@@ -1,0 +1,87 @@
+name: Release
+
+# 合并进 main 就按提交信息自动升版；也可以手动跑（默认只算版本，不落地）。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 只计算版本号，不提交、不打标签、不发布
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    # 自己提交的版本号变更不再触发新一轮发版
+    if: github.event_name == 'workflow_dispatch' || !startsWith(github.event.head_commit.message, 'chore(release)')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # 用默认 token，让版本提交能推回 main
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: https://registry.npmjs.org
+
+      - name: 发版前先自检
+        run: npm test --if-present
+
+      - name: 算下一个版本
+        id: plan
+        run: node .github/scripts/release.mjs --notes-file .release-notes.md >> "$GITHUB_OUTPUT"
+
+      - name: 没有需要发的版本
+        if: steps.plan.outputs.changed != 'true'
+        run: echo "自上一次 tag 之后没有 feat / fix / perf 提交，跳过发版"
+
+      - name: 改版本号、提交、打标签、推回 main
+        if: steps.plan.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
+        run: |
+          set -e
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          npm version "${{ steps.plan.outputs.version }}" --no-git-tag-version --allow-same-version
+          git add package.json
+          git commit -m "chore(release): ${{ steps.plan.outputs.tag }}"
+          git tag "${{ steps.plan.outputs.tag }}"
+          git push origin HEAD:main
+          git push origin "${{ steps.plan.outputs.tag }}"
+
+      - name: 打 tarball
+        id: pack
+        if: steps.plan.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
+        run: echo "tgz=$(npm pack --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: 发布到 npm
+        if: steps.plan.outputs.changed == 'true' && steps.plan.outputs.private != 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::warning::没有配置 NPM_TOKEN secret，跳过 npm 发布（Release 仍会创建）"
+            exit 0
+          fi
+          npm publish --access public --provenance
+
+      - name: 建 GitHub Release
+        if: steps.plan.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.plan.outputs.tag }}" \
+            --title "${{ steps.plan.outputs.tag }}" \
+            --notes-file .release-notes.md \
+            "${{ steps.pack.outputs.tgz }}"

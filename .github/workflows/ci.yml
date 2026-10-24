@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # 没有 test 脚本的仓库会直接跳过，不会因此变红
+      - name: 跑测试
+        run: npm test --if-present
+
+      - name: 语法自检
+        run: |
+          set -e
+          for f in lib/client.js lib/index.js lib/service.js lib/cdp.js lib/launcher.js; do
+            [ -f "$f" ] || continue
+            node --check "$f"
+          done
+
+      # files 字段写错、忘记打包某个文件，这一步会暴露
+      - name: 打包自检
+        run: npm pack --dry-run
