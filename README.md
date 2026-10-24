@@ -1,5 +1,8 @@
 # dsh-annotate-browser
 
+![dsh-annotate-browser](https://raw.githubusercontent.com/zengxiaolou/dsh-annotate-browser/main/docs/images/promo.png)
+
+
 自己的 DSH **标注浏览器**插件：右侧栏里一个**可操作的真实浏览器**（CDP 推流 + 输入转发），在上面点选元素或划选文字、写一句备注，带着源码位置/组件栈/样式/裁图落进聊天输入框。
 **不依赖** `dsh-browser-cdp` 或任何第三方浏览器插件 —— CDP 客户端是本仓库自己实现的（零依赖）。
 
